@@ -6,8 +6,11 @@ import { NewsCard } from './news-card'
 import { PortfolioPerformance } from './portfolio-performance'
 import { ResultsCard } from './results-card'
 import { TopBar } from './top-bar'
+import { WelcomeCard, type PlayerInfo } from './welcome-card'
 
 export function Simulator() {
+  const [player, setPlayer] = useState<PlayerInfo | null>(null)
+
   const [index, setIndex] = useState(0)
   const [balance, setBalance] = useState(STARTING_BALANCE)
   const [history, setHistory] = useState<number[]>([STARTING_BALANCE])
@@ -55,6 +58,8 @@ export function Simulator() {
     setStreak(0)
     setWins(0)
     setFinished(false)
+    // Return to the welcome screen so the player can update their details
+    setPlayer(null)
   }
 
   useEffect(() => {
@@ -69,6 +74,11 @@ export function Simulator() {
     return () => window.removeEventListener('keydown', onKeyDown)
   })
 
+  // ── Gate: show welcome screen until player info is provided ───────
+  if (!player) {
+    return <WelcomeCard onStart={setPlayer} />
+  }
+
   return (
     <div className="min-h-screen" data-portfolio-history={JSON.stringify(history)}>
       <TopBar
@@ -80,7 +90,14 @@ export function Simulator() {
       />
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-10">
         {finished ? (
-          <ResultsCard balance={balance} wins={wins} total={scenarios.length} onRestart={handleRestart} />
+          <ResultsCard
+            balance={balance}
+            wins={wins}
+            total={scenarios.length}
+            playerName={player.name}
+            studentId={player.studentId}
+            onRestart={handleRestart}
+          />
         ) : (
           <NewsCard
             key={scenario.id}
