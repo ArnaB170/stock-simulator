@@ -34,8 +34,11 @@ export function Leaderboard() {
         }))
         setEntries(data)
       } catch (err) {
-        console.error('Failed to fetch leaderboard:', err)
-        setError('Could not load leaderboard.')
+        // Log with the exact label so it's easy to spot in DevTools → Console
+        console.error('Firebase Error:', err)
+        setError(
+          'Could not load leaderboard. Open DevTools → Console and look for "Firebase Error:" to diagnose (likely a missing config or Firestore rules issue).',
+        )
       } finally {
         setLoading(false)
       }
@@ -57,7 +60,10 @@ export function Leaderboard() {
       )}
 
       {error && (
-        <p className="py-4 text-center text-sm text-loss">{error}</p>
+        <div className="rounded-xl border border-loss/30 bg-loss/10 px-4 py-3 text-sm text-loss">
+          <p className="font-semibold">Leaderboard error</p>
+          <p className="mt-1 text-xs leading-relaxed opacity-80">{error}</p>
+        </div>
       )}
 
       {!loading && !error && entries.length === 0 && (

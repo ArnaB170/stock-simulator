@@ -27,6 +27,7 @@ export function WelcomeCard({ onStart }: WelcomeCardProps) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    e.stopPropagation()
     if (!validate()) return
     onStart({ name: name.trim(), studentId: studentId.trim() })
   }

@@ -63,7 +63,10 @@ export function Simulator() {
   }
 
   useEffect(() => {
-    if (finished || selected) return
+    // Do not attach keyboard shortcuts while the WelcomeCard is shown.
+    // Without this guard, typing 'a'/'b'/'c' into the form inputs would
+    // silently auto-answer scenario 0 before the game even started.
+    if (!player || finished || selected) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return
       const choiceIndex = ['a', 'b', 'c'].indexOf(event.key.toLowerCase())
