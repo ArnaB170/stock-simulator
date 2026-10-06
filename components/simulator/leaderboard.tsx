@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
+import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { db, isFirebaseConfigured } from '@/lib/firebase'
 import { formatCurrency } from '@/lib/format'
 
@@ -25,14 +25,17 @@ export function Leaderboard() {
       return
     }
 
-    async function fetchLeaderboard() {
-      try {
-        const q = query(
-          collection(db, 'leaderboard'),
-          orderBy('highScore', 'desc'),
-          limit(10),
-        )
-        const snapshot = await getDocs(q)
+    const q = query(
+      collection(db, 'leaderboard'),
+      orderBy('highScore', 'desc'),
+      limit(10),
+    )
+
+    // Listen to the database in real-time. This fixes the race condition because
+    // it will instantly trigger a re-render the moment ResultsCard finishes saving.
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
         const data: LeaderboardEntry[] = snapshot.docs.map((doc, i) => ({
           rank: i + 1,
           name: doc.data().name as string,
@@ -40,15 +43,17 @@ export function Leaderboard() {
           highScore: doc.data().highScore as number,
         }))
         setEntries(data)
-      } catch (err) {
+        setLoading(false)
+      },
+      (err) => {
         console.error('Firebase Error:', err)
         setError('fetch-failed')
-      } finally {
         setLoading(false)
-      }
-    }
+      },
+    )
 
-    fetchLeaderboard()
+    // Cleanup the listener when the component unmounts
+    return () => unsubscribe()
   }, [])
 
   return (
