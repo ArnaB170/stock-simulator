@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { db, isFirebaseConfigured } from '@/lib/firebase'
 import { formatCurrency } from '@/lib/format'
 
 type LeaderboardEntry = {
@@ -18,6 +18,13 @@ export function Leaderboard() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Show a clear message instead of crashing when Firebase isn't configured yet
+    if (!isFirebaseConfigured) {
+      setError('not-configured')
+      setLoading(false)
+      return
+    }
+
     async function fetchLeaderboard() {
       try {
         const q = query(
@@ -34,11 +41,8 @@ export function Leaderboard() {
         }))
         setEntries(data)
       } catch (err) {
-        // Log with the exact label so it's easy to spot in DevTools → Console
         console.error('Firebase Error:', err)
-        setError(
-          'Could not load leaderboard. Open DevTools → Console and look for "Firebase Error:" to diagnose (likely a missing config or Firestore rules issue).',
-        )
+        setError('fetch-failed')
       } finally {
         setLoading(false)
       }
@@ -48,30 +52,47 @@ export function Leaderboard() {
   }, [])
 
   return (
-    <section className="animate-in fade-in slide-in-from-bottom-4 rounded-2xl border border-border bg-card p-6 duration-500">
+    <section className="rounded-2xl border border-border bg-card p-6">
       <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
         🏆 Global Leaderboard — Top 10
       </h2>
 
+      {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <span className="text-sm text-muted-foreground animate-pulse">Loading…</span>
+          <span className="animate-pulse text-sm text-muted-foreground">Loading…</span>
         </div>
       )}
 
-      {error && (
-        <div className="rounded-xl border border-loss/30 bg-loss/10 px-4 py-3 text-sm text-loss">
-          <p className="font-semibold">Leaderboard error</p>
-          <p className="mt-1 text-xs leading-relaxed opacity-80">{error}</p>
+      {/* Firebase not configured yet */}
+      {!loading && error === 'not-configured' && (
+        <div className="rounded-xl border border-dashed border-border px-4 py-6 text-center">
+          <p className="text-sm font-medium text-muted-foreground">Leaderboard not available</p>
+          <p className="mt-1 text-xs text-muted-foreground opacity-60">
+            Paste your Firebase config into <code className="font-mono">lib/firebase.ts</code> to enable it.
+          </p>
         </div>
       )}
 
+      {/* Firebase configured but fetch failed (rules / network issue) */}
+      {!loading && error === 'fetch-failed' && (
+        <div className="rounded-xl border border-loss/30 bg-loss/10 px-4 py-3">
+          <p className="text-sm font-semibold text-loss">Could not load leaderboard</p>
+          <p className="mt-1 text-xs leading-relaxed text-loss opacity-80">
+            Open DevTools → Console and look for <code className="font-mono">&quot;Firebase Error:&quot;</code> to
+            diagnose the issue (likely a Firestore rules or projectId mismatch).
+          </p>
+        </div>
+      )}
+
+      {/* Empty — Firebase is fine but no scores yet */}
       {!loading && !error && entries.length === 0 && (
         <p className="py-4 text-center text-sm text-muted-foreground">
           No scores yet — be the first!
         </p>
       )}
 
+      {/* Leaderboard table */}
       {!loading && !error && entries.length > 0 && (
         <ol className="flex flex-col divide-y divide-border">
           {entries.map((entry) => (
