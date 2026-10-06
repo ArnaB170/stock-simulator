@@ -7,11 +7,13 @@ import { PortfolioPerformance } from './portfolio-performance'
 import { ResultsCard } from './results-card'
 import { TopBar } from './top-bar'
 import { WelcomeCard, type PlayerInfo } from './welcome-card'
+import { BriefingCard } from './briefing-card'
 import { Leaderboard } from './leaderboard'
 
 export function Simulator() {
   const [player, setPlayer] = useState<PlayerInfo | null>(null)
   const [activeScenarios, setActiveScenarios] = useState<Scenario[]>([])
+  const [briefingDone, setBriefingDone] = useState(false)
 
   const [index, setIndex] = useState(0)
   const [balance, setBalance] = useState(STARTING_BALANCE)
@@ -30,6 +32,7 @@ export function Simulator() {
     // Shuffle the available 10 scenarios and pick exactly 5 for this session
     const shuffled = [...scenarios].sort(() => Math.random() - 0.5).slice(0, 5)
     setActiveScenarios(shuffled)
+    setBriefingDone(false)
     setPlayer(playerInfo)
   }
 
@@ -72,10 +75,10 @@ export function Simulator() {
   }
 
   useEffect(() => {
-    // Do not attach keyboard shortcuts while the WelcomeCard is shown.
+    // Do not attach keyboard shortcuts while the WelcomeCard or BriefingCard is shown.
     // Without this guard, typing 'a'/'b'/'c' into the form inputs would
     // silently auto-answer scenario 0 before the game even started.
-    if (!player || finished || selected) return
+    if (!player || !briefingDone || finished || selected) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return
       const choiceIndex = ['a', 'b', 'c'].indexOf(event.key.toLowerCase())
@@ -89,6 +92,11 @@ export function Simulator() {
   // ── Gate: show welcome screen until player info is provided ───────
   if (!player || activeScenarios.length === 0) {
     return <WelcomeCard onStart={handleStart} />
+  }
+
+  // ── Gate: show briefing screen until the player presses Enter ───────
+  if (!briefingDone) {
+    return <BriefingCard playerName={player.name} onContinue={() => setBriefingDone(true)} />
   }
 
   return (
