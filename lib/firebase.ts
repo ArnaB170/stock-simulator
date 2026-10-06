@@ -4,12 +4,13 @@ import { getFirestore } from 'firebase/firestore'
 // TODO: Paste your Firebase project config values below.
 // Find them at: Firebase Console → Project Settings → Your Apps → SDK setup and configuration
 const firebaseConfig = {
-  apiKey: '',
-  authDomain: '',
-  projectId: '',
-  storageBucket: '',
-  messagingSenderId: '',
-  appId: '',
+  apiKey: "AIzaSyCQbQhSbtzFocKo6PKBGudSFygM1CnDBU",
+  authDomain: "stock-simulator-815e3.firebaseapp.com",
+  projectId: "stock-simulator-815e3",
+  storageBucket: "stock-simulator-815e3.firebasestorage.app",
+  messagingSenderId: "968172192379",
+  appId: "1:968172192379:web:774aebb699009372d198de",
+  measurementId: "G-HXKE7P1HWE"
 }
 
 /**
