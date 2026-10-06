@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { type Choice, STARTING_BALANCE, scenarios } from '@/lib/scenarios'
+import { type Choice, type Scenario, STARTING_BALANCE, scenarios } from '@/lib/scenarios'
 import { NewsCard } from './news-card'
 import { PortfolioPerformance } from './portfolio-performance'
 import { ResultsCard } from './results-card'
@@ -11,6 +11,7 @@ import { Leaderboard } from './leaderboard'
 
 export function Simulator() {
   const [player, setPlayer] = useState<PlayerInfo | null>(null)
+  const [activeScenarios, setActiveScenarios] = useState<Scenario[]>([])
 
   const [index, setIndex] = useState(0)
   const [balance, setBalance] = useState(STARTING_BALANCE)
@@ -21,9 +22,16 @@ export function Simulator() {
   const [wins, setWins] = useState(0)
   const [finished, setFinished] = useState(false)
 
-  const scenario = scenarios[index]
-  const isLast = index === scenarios.length - 1
-  const completedCount = finished ? scenarios.length : index + (selected ? 1 : 0)
+  const scenario = activeScenarios[index]
+  const isLast = index === activeScenarios.length - 1
+  const completedCount = finished ? activeScenarios.length : index + (selected ? 1 : 0)
+
+  function handleStart(playerInfo: PlayerInfo) {
+    // Shuffle the available 7 scenarios and pick exactly 5 for this session
+    const shuffled = [...scenarios].sort(() => Math.random() - 0.5).slice(0, 5)
+    setActiveScenarios(shuffled)
+    setPlayer(playerInfo)
+  }
 
   function handleSelect(choice: Choice) {
     if (selected) return
@@ -79,8 +87,8 @@ export function Simulator() {
   })
 
   // ── Gate: show welcome screen until player info is provided ───────
-  if (!player) {
-    return <WelcomeCard onStart={setPlayer} />
+  if (!player || activeScenarios.length === 0) {
+    return <WelcomeCard onStart={handleStart} />
   }
 
   return (
@@ -88,7 +96,7 @@ export function Simulator() {
       <TopBar
         balance={balance}
         scenarioNumber={index + 1}
-        totalScenarios={scenarios.length}
+        totalScenarios={activeScenarios.length}
         completedCount={completedCount}
         streak={streak}
       />
@@ -98,7 +106,7 @@ export function Simulator() {
             <ResultsCard
               balance={balance}
               wins={wins}
-              total={scenarios.length}
+              total={activeScenarios.length}
               playerName={player.name}
               studentId={player.studentId}
               onRestart={handleRestart}
