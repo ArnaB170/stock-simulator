@@ -27,7 +27,7 @@ export function Simulator() {
   const completedCount = finished ? activeScenarios.length : index + (selected ? 1 : 0)
 
   function handleStart(playerInfo: PlayerInfo) {
-    // Shuffle the available 7 scenarios and pick exactly 5 for this session
+    // Shuffle the available 10 scenarios and pick exactly 5 for this session
     const shuffled = [...scenarios].sort(() => Math.random() - 0.5).slice(0, 5)
     setActiveScenarios(shuffled)
     setPlayer(playerInfo)

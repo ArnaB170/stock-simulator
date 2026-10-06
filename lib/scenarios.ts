@@ -82,5 +82,35 @@ export const scenarios: Scenario[] = [
       { action: "Buy into leading cybersecurity company stocks", multiplier: 1.22 },
       { action: "Buy the dip on the retail company — they'll recover eventually", multiplier: 0.72 }
     ]
+  },
+  {
+    id: 8,
+    headline: "🚨 BREAKING: World's most popular social media app banned in 3 major countries over privacy violations!",
+    context: "Regulators in the EU, India, and Brazil have pulled the plug. The company loses access to over 800 million users overnight. Stock is in freefall.",
+    choices: [
+      { action: "Buy the dip — bans are temporary and will be reversed soon", multiplier: 0.74 },
+      { action: "Sell immediately and move funds into a competitor's stock", multiplier: 1.19 },
+      { action: "Hold your shares and trust the company's legal team to fight back", multiplier: 0.86 }
+    ]
+  },
+  {
+    id: 9,
+    headline: "🚨 BREAKING: Unemployment rate hits a 15-year LOW — economy adds 500,000 jobs in a single month!",
+    context: "Consumer spending is surging. People have money in their pockets. Retail, travel, and entertainment sectors are seeing record foot traffic.",
+    choices: [
+      { action: "Invest in consumer spending stocks — retail, travel, and restaurants", multiplier: 1.21 },
+      { action: "Pull out of the stock market — a booming economy always crashes next", multiplier: 0.81 },
+      { action: "Put everything into gold as a safe haven asset", multiplier: 0.89 }
+    ]
+  },
+  {
+    id: 10,
+    headline: "🚨 BREAKING: A major cryptocurrency exchange collapses — billions in customer funds are frozen!",
+    context: "The exchange filed for bankruptcy after a liquidity crisis. Crypto markets are in panic mode. Bitcoin drops 40% in 24 hours. Traditional banks are reporting a surge in new account openings.",
+    choices: [
+      { action: "Buy Bitcoin and crypto now — this is the lowest price ever!", multiplier: 0.65 },
+      { action: "Invest in traditional banking stocks benefiting from the crypto exodus", multiplier: 1.23 },
+      { action: "Buy shares in the collapsed exchange — assets will be recovered in court", multiplier: 0.60 }
+    ]
   }
 ]
